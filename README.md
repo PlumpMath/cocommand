@@ -1,6 +1,8 @@
 require:
 
-    gevent
+    greenlet
+    Cython
+    gevent 1.0b3 or 1.0dev
 
 usage:
 

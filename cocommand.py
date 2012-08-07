@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 '''
-author: smallfish <xiaoyu.chen@alibaba-inc.com>
-desc  : run more command use gevent coroutine
-
-usage :
+run more command use gevent coroutine
+author: smallfish <smallfish.xy@gmail.com
+usage:
     ./cocommand.py -f [FILE] -c [CONCURRENT] -t [TIMEOUT]'
 '''
 from sys import exit
