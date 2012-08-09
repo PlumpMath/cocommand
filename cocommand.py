@@ -5,9 +5,9 @@ author: smallfish <smallfish.xy@gmail.com
 usage:
     ./cocommand.py -f [FILE] -c [CONCURRENT] -t [TIMEOUT]'
 '''
+from __future__ import with_statement
 from sys import exit
 from optparse import OptionParser
-from itertools import izip_longest
 try:
     import gevent
     import gevent.subprocess as subprocess
@@ -38,8 +38,15 @@ def spawn_command(cmd):
     return cmd, False
 
 def array_split(array, n):
-    args = [iter(array)] * n
-    return list(izip_longest(*args))
+    result = []
+    m = len(array)
+    count = m/n
+    if m % n != 0:
+        count += 1
+    for i in xrange(count):
+        start, end = i*n, (i+1)*n
+        result.append(array[start:end])
+    return result
 
 def get_file_lines(f):
     return [line.strip() for line in open(f) if line]
