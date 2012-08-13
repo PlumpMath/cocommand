@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 run more command use gevent coroutine
-author: smallfish <smallfish.xy@gmail.com
+author: smallfish <smallfish.xy@gmail.com>
 usage:
     ./cocommand.py -f [FILE] -c [CONCURRENT] -t [TIMEOUT]'
 '''
