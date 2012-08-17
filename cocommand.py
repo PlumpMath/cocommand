@@ -15,6 +15,9 @@ except:
     print 'require gevent'
     exit(1)
 
+# errors output
+errors = []
+
 parser = OptionParser(usage='%prog -f [FILE] -c [CONCURRENT] -t [TIMEOUT]')
 parser.add_option('-f', '--file', metavar='filename', help='file with command list')
 parser.add_option('-c', '--concurrency', default=10, type='int', metavar='num', help='concurrency num, default: %default')
@@ -31,10 +34,19 @@ def spawn_jobs(group, func):
     return [job.value for job in jobs]
 
 def spawn_command(cmd):
+    code, out, err = 0, '', ''
     with gevent.Timeout(opts.timeout, False):
-        ret = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if ret == 0:
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        code = p.returncode
+        if code == 0:
             return cmd, True
+        else:
+            errors.append({"command": cmd, "code": code, "error": err, "out": out})
+            return cmd, False
+    code = -1
+    err  = 'timeout>%d' % opts.timeout
+    errors.append({"command": cmd, "code": code, "error": err, "out": out})
     return cmd, False
 
 def array_split(array, n):
@@ -55,6 +67,10 @@ def main():
     for group in array_split(get_file_lines(opts.file), opts.concurrency):
         for (cmd, result) in spawn_jobs(group, spawn_command):
             print '%s\t%s' % (cmd, result and 'SUCCESS' or 'FAILURE') 
+    if errors:
+        f = 'cocommand_errors.log'
+        open(f, 'w').writelines('\n'.join([str(item) for item in errors]))
+        print 'write errors into %s, line: %d' % (f, len(errors))
 
 if __name__ == '__main__':
     main()
